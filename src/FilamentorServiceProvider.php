@@ -3,7 +3,6 @@
 namespace Geosem42\Filamentor;
 
 use Filament\Support\Assets\AlpineComponent;
-use Filament\Support\Assets\Asset;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
@@ -76,11 +75,19 @@ class FilamentorServiceProvider extends PackageServiceProvider
         $registry->register(Video::class);
         $this->app->instance(ElementRegistry::class, $registry);
 
-        // Register Livewire Components Right Here!
-        Livewire::component('page', \App\Livewire\Page::class);
-        Livewire::component('text-element', \App\Livewire\Elements\TextElement::class);
-        Livewire::component('image-element', \App\Livewire\Elements\ImageElement::class);
-        Livewire::component('video-element', \App\Livewire\Elements\VideoElement::class);
+        // Register published Livewire components when they exist in the host app.
+        if (class_exists(\App\Livewire\Page::class)) {
+            Livewire::component('page', \App\Livewire\Page::class);
+        }
+        if (class_exists(\App\Livewire\Elements\TextElement::class)) {
+            Livewire::component('text-element', \App\Livewire\Elements\TextElement::class);
+        }
+        if (class_exists(\App\Livewire\Elements\ImageElement::class)) {
+            Livewire::component('image-element', \App\Livewire\Elements\ImageElement::class);
+        }
+        if (class_exists(\App\Livewire\Elements\VideoElement::class)) {
+            Livewire::component('video-element', \App\Livewire\Elements\VideoElement::class);
+        }
         
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -121,7 +128,7 @@ class FilamentorServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * @return array<Asset>
+     * @return array
      */
     protected function getAssets(): array
     {

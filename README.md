@@ -17,10 +17,10 @@ Filamentor is a powerful, flexible page builder plugin for Laravel Filament that
 
 ### Prerequisites
 
-- PHP 8.1 or higher
+- PHP 8.2 or higher
 - Laravel 11.x or higher
-- Filament 3.x
-- Tailwind CSS
+- Filament 5.x
+- Tailwind CSS 4.x
 
 ## CSS Framework Dependency
 
@@ -94,6 +94,12 @@ module.exports = {
     ],
     // ...other config
 }
+```
+
+If you are using Tailwind CSS 4, you can also safelist this pattern directly from your CSS entry:
+
+```css
+@source inline("{grid-cols-1,grid-cols-2,grid-cols-3,grid-cols-4,grid-cols-5,grid-cols-6,grid-cols-7,grid-cols-8,grid-cols-9,grid-cols-10,grid-cols-11,grid-cols-12}");
 ```
 
 ### Step 6: Register with Filament

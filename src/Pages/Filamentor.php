@@ -6,8 +6,8 @@ use Filament\Pages\Page;
 
 class Filamentor extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Page Builder';
     protected static ?string $title = 'Page Builder';
-    protected static string $view = 'filamentor::pages.filamentor';
+    protected string $view = 'filamentor::pages.filamentor';
 }

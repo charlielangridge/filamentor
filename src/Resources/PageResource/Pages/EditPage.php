@@ -2,9 +2,9 @@
 
 namespace Geosem42\Filamentor\Resources\PageResource\Pages;
 
-use geosem42\Filamentor\Resources\PageResource;
+use Geosem42\Filamentor\Resources\PageResource;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
@@ -26,7 +26,7 @@ class EditPage extends EditRecord
     use WithFileUploads;
 
     protected static string $resource = PageResource::class;
-    protected static string $view = 'filamentor::pages.builder';
+    protected string $view = 'filamentor::pages.builder';
     protected $listeners = ['editElement'];
     public $activeElementType = '';
     public $temporaryUpload;
@@ -47,9 +47,9 @@ class EditPage extends EditRecord
         ]
     ];
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Section::make('Page Details')
                     ->schema([
@@ -154,16 +154,16 @@ class EditPage extends EditRecord
     /**
      * Generates a Filament form for editing the currently active element
      * 
-     * @return \Filament\Forms\Form The generated form instance
+     * @return \Filament\Schemas\Schema The generated form instance
     */
 
-    public function getElementForm(): Form
+    public function getElementForm(): Schema
     {
         try {
             // Check if we have an active element type
             if (empty($this->activeElementType)) {
                 Log::warning('Attempted to build form with no active element type');
-                return Form::make($this)->schema([]);
+                return Schema::make($this)->schema([]);
             }
             
             // Get the element registry service
@@ -174,7 +174,7 @@ class EditPage extends EditRecord
             
             // Build the schema based on the element's settings
             if ($element instanceof ElementInterface) {
-                return Form::make($this)
+                return Schema::make($this)
                     ->schema($this->buildElementFormSchema($element));
             }
             
@@ -184,7 +184,7 @@ class EditPage extends EditRecord
             ]);
             
             // Return empty form if element doesn't exist
-            return Form::make($this)->schema([]);
+            return Schema::make($this)->schema([]);
         } catch (\Exception $e) {
             // Log any exceptions
             Log::error('Error building element form', [
@@ -193,7 +193,7 @@ class EditPage extends EditRecord
             ]);
             
             // Return an empty form in case of exception
-            return Form::make($this)->schema([]);
+            return Schema::make($this)->schema([]);
         }
     }
 

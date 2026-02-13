@@ -4,14 +4,6 @@ namespace Geosem42\Filamentor\Tests;
 
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
-use Filament\Actions\ActionsServiceProvider;
-use Filament\FilamentServiceProvider;
-use Filament\Forms\FormsServiceProvider;
-use Filament\Infolists\InfolistsServiceProvider;
-use Filament\Notifications\NotificationsServiceProvider;
-use Filament\Support\SupportServiceProvider;
-use Filament\Tables\TablesServiceProvider;
-use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -31,21 +23,42 @@ class TestCase extends Orchestra
 
     protected function getPackageProviders($app)
     {
-        return [
-            ActionsServiceProvider::class,
+        $providers = [
+            FilamentorServiceProvider::class,
+        ];
+
+        $optionalProviders = [
             BladeCaptureDirectiveServiceProvider::class,
             BladeHeroiconsServiceProvider::class,
             BladeIconsServiceProvider::class,
-            FilamentServiceProvider::class,
-            FormsServiceProvider::class,
-            InfolistsServiceProvider::class,
             LivewireServiceProvider::class,
-            NotificationsServiceProvider::class,
-            SupportServiceProvider::class,
-            TablesServiceProvider::class,
-            WidgetsServiceProvider::class,
-            FilamentorServiceProvider::class,
         ];
+
+        foreach ($optionalProviders as $provider) {
+            if (class_exists($provider)) {
+                $providers[] = $provider;
+            }
+        }
+
+        $filamentProviders = [
+            'Filament\\FilamentServiceProvider',
+            'Filament\\Actions\\ActionsServiceProvider',
+            'Filament\\Forms\\FormsServiceProvider',
+            'Filament\\Infolists\\InfolistsServiceProvider',
+            'Filament\\Notifications\\NotificationsServiceProvider',
+            'Filament\\Schemas\\SchemasServiceProvider',
+            'Filament\\Support\\SupportServiceProvider',
+            'Filament\\Tables\\TablesServiceProvider',
+            'Filament\\Widgets\\WidgetsServiceProvider',
+        ];
+
+        foreach ($filamentProviders as $provider) {
+            if (class_exists($provider)) {
+                $providers[] = $provider;
+            }
+        }
+
+        return $providers;
     }
 
     public function getEnvironmentSetUp($app)

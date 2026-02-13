@@ -2,7 +2,7 @@
 
 namespace Geosem42\Filamentor\Resources\PageResource\Pages;
 
-use geosem42\Filamentor\Resources\PageResource;
+use Geosem42\Filamentor\Resources\PageResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePage extends CreateRecord

@@ -1,4 +1,4 @@
-<x-filament::page>
+<x-filament-panels::page>
     <form wire:submit.prevent="save">
         {{ $this->form }}
 
@@ -487,4 +487,4 @@
             </div>
         </div>
     </form>
-</x-filament::page>
+</x-filament-panels::page>
