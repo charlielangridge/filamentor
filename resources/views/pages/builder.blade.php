@@ -8,10 +8,9 @@
             </x-filament::button>
         </div>
 
+        @filamentStyles(['filamentor'])
 
-        <div class="filamentor-canvas pt-4" x-data="filamentor" x-load-css="[
-            @js(\Filament\Support\Facades\FilamentAsset::getStyleHref('filamentor', 'filamentor'))
-        ]" x-load-js="[
+        <div class="filamentor-canvas pt-4" x-data="filamentor" x-load-js="[
             @js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('filamentor', 'filamentor')),
             @js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('alpine-sort', 'filamentor'))
         ]">
