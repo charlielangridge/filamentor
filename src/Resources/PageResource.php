@@ -4,6 +4,8 @@ namespace Geosem42\Filamentor\Resources;
 
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,14 +22,14 @@ class PageResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Basic Information')
+                Section::make('Basic Information')
                     ->columnSpan(9)
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn(string $state, Forms\Set $set) =>
+                            ->afterStateUpdated(fn(string $state, Set $set) =>
                                 $set('slug', Str::slug($state))),
                         Forms\Components\TextInput::make('slug')
                             ->required()
@@ -37,7 +39,7 @@ class PageResource extends Resource
                             ->maxLength(65535),
                     ]),
 
-                Forms\Components\Section::make('Publishing')
+                Section::make('Publishing')
                     ->columnSpan(3)
                     ->schema([
                         Forms\Components\Toggle::make('is_published')
