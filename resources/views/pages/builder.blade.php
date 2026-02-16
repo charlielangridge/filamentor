@@ -9,12 +9,12 @@
         </div>
 
 
-        <div class="filamentor-canvas pt-4" x-data="filamentor" x-load-js="[
+        <div class="filamentor-canvas pt-4" x-data="filamentor" x-load-css="[
+            @js(\Filament\Support\Facades\FilamentAsset::getStyleHref('filamentor', 'filamentor'))
+        ]" x-load-js="[
             @js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('filamentor', 'filamentor')),
             @js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('alpine-sort', 'filamentor'))
         ]">
-            <link id="filamentor-builder-css" rel="stylesheet"
-                href="{{ \Filament\Support\Facades\FilamentAsset::getStyleHref('filamentor', 'filamentor') }}">
 
             <div class="flex justify-start">
                 <button type="button"
@@ -141,7 +141,9 @@
                                                                 <div class="flex items-center h-[80px]">
                                                                     <template x-if="element.content?.thumbnail">
                                                                         <div class="flex flex-row items-center">
-                                                                            <img :src="element.content.thumbnail"
+                                                                            <img src="" alt="Element image preview"
+                                                                                :src="element.content.thumbnail"
+                                                                                :alt="element.content?.alt || 'Element image preview'"
                                                                                 class="w-16 h-16 object-cover rounded border border-gray-200 dark:border-gray-700" />
                                                                             <span
                                                                                 class="text-xs text-gray-500 dark:text-gray-400 ml-3 line-clamp-2"
@@ -283,6 +285,8 @@
                                 class="w-full rounded-lg dark:bg-gray-800 focus:ring-0 filamentor-spacing-input filamentor-spacing-input-first"
                                 placeholder="Enter custom classes" x-bind:value="activeRow?.customClasses || ''"
                                 @input="activeRow && (activeRow.customClasses = $event.target.value)">
+                        </div>
+
                         </div>
 
                         <x-slot name="footer">
