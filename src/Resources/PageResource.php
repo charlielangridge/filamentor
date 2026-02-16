@@ -3,6 +3,7 @@
 namespace Geosem42\Filamentor\Resources;
 
 use Filament\Forms;
+use Filament\Panel;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
@@ -10,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Geosem42\Filamentor\Models\Page;
+use Geosem42\Filamentor\Support\LayoutState;
 use Illuminate\Support\Str;
 
 class PageResource extends Resource
@@ -48,11 +50,11 @@ class PageResource extends Resource
                     ]),
 
                 Forms\Components\Hidden::make('layout')
-                ->default('[]')  // Set empty array as default
+                ->default('[]')
                 ->afterStateHydrated(function ($component, $state) {
-                    $component->state($state === 'null' ? '[]' : $state);
+                    $component->state(LayoutState::toJsonString($state));
                 })
-                ->dehydrateStateUsing(fn ($state) => $state ?: '[]'),
+                ->dehydrateStateUsing(fn ($state) => LayoutState::toJsonString($state)),
 
             ])
             ->columns(12);
@@ -78,6 +80,11 @@ class PageResource extends Resource
             'create' => PageResource\Pages\CreatePage::route('/create'),
             'edit' => PageResource\Pages\EditPage::route('/{record}/edit'),
         ];
+    }
+
+    public static function getSlug(?Panel $panel = null): string
+    {
+        return (string) config('filamentor.resource_slug', 'filamentor-pages');
     }
 
 }

@@ -120,6 +120,23 @@ public function panel(Panel $panel): Panel
 }
 ```
 
+### Resource Slug Configuration
+
+Filamentor uses `filamentor-pages` as the default resource slug to avoid collisions with host app resources that use `pages`.
+
+If you need backward compatibility with an existing setup, publish the config and set:
+
+```php
+// config/filamentor.php
+'resource_slug' => 'pages',
+```
+
+You can also set it through environment config:
+
+```env
+FILAMENTOR_RESOURCE_SLUG=pages
+```
+
 ### Step 7: Compile Assets (if using Vue)
 
 If you're using the Vue stack, run:

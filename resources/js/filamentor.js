@@ -2,6 +2,9 @@ import '../css/filamentor.css';
 import './store';
 import { createDragHandlers } from './dragHandlers';
 
+if (!window.__filamentorBuilderDataRegistered) {
+    window.__filamentorBuilderDataRegistered = true;
+
 window.addEventListener('alpine:init', () => {
 
     Alpine.data('filamentor', () => {
@@ -29,39 +32,23 @@ window.addEventListener('alpine:init', () => {
              */
             init() {
                 try {
-                    // Check if canvasData reference exists
-                    if (!this.$refs.canvasData) {
-                        console.warn('Canvas data reference not found');
-                        return;
+                    const rawLayout = this.$wire?.get?.('data.layout') ?? this.$refs.canvasData?.value ?? '[]';
+                    const layoutJson = this.normalizeLayoutJson(rawLayout);
+
+                    if (this.$refs.canvasData) {
+                        this.$refs.canvasData.value = layoutJson;
                     }
-            
-                    const savedLayout = this.$refs.canvasData.value;
-                    
-                    // Check if savedLayout exists and is not empty
-                    if (savedLayout) {
-                        try {
-                            const parsedRows = JSON.parse(savedLayout);
-                            
-                            // Validate parsed data is an array
-                            if (!Array.isArray(parsedRows)) {
-                                console.error('Parsed layout is not an array');
-                                return;
-                            }
-                            
-                            // Sort with fallback handling for missing order property
-                            const sortedRows = parsedRows.sort((a, b) => {
-                                const orderA = a.order !== undefined ? a.order : 0;
-                                const orderB = b.order !== undefined ? b.order : 0;
-                                return orderA - orderB;
-                            });
-                            
-                            Alpine.store('rows').setRows(sortedRows);
-                        } catch (parseError) {
-                            console.error('Failed to parse layout JSON:', parseError);
-                            // Initialize with empty layout instead of crashing
-                            Alpine.store('rows').setRows([]);
-                        }
-                    }
+
+                    const parsedRows = JSON.parse(layoutJson);
+                    const rows = Array.isArray(parsedRows) ? parsedRows : [];
+
+                    const sortedRows = rows.sort((a, b) => {
+                        const orderA = a.order !== undefined ? a.order : 0;
+                        const orderB = b.order !== undefined ? b.order : 0;
+                        return orderA - orderB;
+                    });
+
+                    Alpine.store('rows').setRows(sortedRows);
                 } catch (error) {
                     console.error('Error initializing builder:', error);
                     // Ensure we at least have an empty layout
@@ -1636,6 +1623,29 @@ window.addEventListener('alpine:init', () => {
                 }
             },
 
+            normalizeLayoutJson(value) {
+                if (Array.isArray(value)) {
+                    return JSON.stringify(value);
+                }
+
+                if (typeof value !== 'string') {
+                    return '[]';
+                }
+
+                const trimmed = value.trim();
+
+                if (!trimmed || trimmed === 'null') {
+                    return '[]';
+                }
+
+                try {
+                    JSON.parse(trimmed);
+                    return trimmed;
+                } catch {
+                    return '[]';
+                }
+            },
+
             // Helper function to safely parse numbers
             safeParseNumber(value) {
                 try {
@@ -1648,3 +1658,4 @@ window.addEventListener('alpine:init', () => {
         };
     });
 });
+}

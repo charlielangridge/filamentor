@@ -9,6 +9,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Str;
+use Geosem42\Filamentor\Support\LayoutState;
 
 class EditPage extends EditRecord
 {
@@ -32,7 +34,7 @@ class EditPage extends EditRecord
     public $temporaryUpload;
     protected $isLoading = false;
     public ?array $media = [];
-    public ?array $data = null;
+    public ?array $data = [];
     public ?array $elementData = [
         'text' => [
             'content' => null,
@@ -100,7 +102,32 @@ class EditPage extends EditRecord
                             ->directory('page-social-images')
                             ->helperText('Used when sharing this page on social media (1200x630 pixels recommended)'),
                     ]),
+                Hidden::make('layout')
+                    ->default('[]')
+                    ->afterStateHydrated(function (Hidden $component, $state): void {
+                        $component->state(LayoutState::toJsonString($state));
+                    })
+                    ->dehydrateStateUsing(fn ($state): string => LayoutState::toJsonString($state)),
             ]);
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['layout'] = LayoutState::toJsonString($data['layout'] ?? null);
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['layout'] = LayoutState::toJsonString($data['layout'] ?? null);
+
+        return $data;
+    }
+
+    public function getLayoutStateJson(): string
+    {
+        return LayoutState::toJsonString($this->data['layout'] ?? $this->record?->layout ?? null);
     }
 
     /**
@@ -457,16 +484,13 @@ class EditPage extends EditRecord
     public function saveLayout(string $layout): array
     {
         try {
-            // Validate layout is valid JSON
-            json_decode($layout);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \InvalidArgumentException('Invalid JSON layout data provided');
-            }
+            $normalizedLayout = LayoutState::toJsonString($layout);
             
             // Update and save the record
-            $this->record->layout = $layout;
+            $this->record->layout = $normalizedLayout;
             $this->record->save();
             $this->record->refresh();
+            $this->data['layout'] = $normalizedLayout;
             
             return [
                 'success' => true,
@@ -495,11 +519,7 @@ class EditPage extends EditRecord
     public function reorderColumns($rowId, string $columns): void
     {
         try {
-            // Get current layout
-            $layout = json_decode($this->record->layout, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new \InvalidArgumentException('Invalid layout JSON in record');
-            }
+            $layout = LayoutState::toArray($this->record->layout);
             
             // Decode columns data
             $columnsData = json_decode($columns, true);
@@ -529,9 +549,10 @@ class EditPage extends EditRecord
             }
             
             // Save the entire layout
-            $this->record->layout = json_encode($layout);
+            $this->record->layout = LayoutState::toJsonString($layout);
             $this->record->save();
             $this->record->refresh();
+            $this->data['layout'] = LayoutState::toJsonString($layout);
         } catch (\Exception $e) {
             Log::error('Failed to reorder columns', [
                 'error' => $e->getMessage(),

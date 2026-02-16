@@ -5,6 +5,8 @@ namespace Geosem42\Filamentor\Tests;
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
@@ -19,11 +21,28 @@ class TestCase extends Orchestra
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Geosem42\\Filamentor\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
+
+        if (! Schema::hasTable('filamentor_pages')) {
+            Schema::create('filamentor_pages', function (Blueprint $table): void {
+                $table->id();
+                $table->string('title');
+                $table->string('slug')->unique();
+                $table->text('description')->nullable();
+                $table->json('layout')->nullable();
+                $table->boolean('is_published')->default(false);
+                $table->string('meta_title')->nullable();
+                $table->text('meta_description')->nullable();
+                $table->string('og_image')->nullable();
+                $table->timestamps();
+            });
+        }
+
     }
 
     protected function getPackageProviders($app)
     {
         $providers = [
+            AdminPanelProvider::class,
             FilamentorServiceProvider::class,
         ];
 

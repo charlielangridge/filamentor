@@ -1,5 +1,6 @@
-document.addEventListener("alpine:init", () => {
-  Alpine.store("rows", {
+if (!window.__filamentorRowsStoreRegistered) {
+  window.__filamentorRowsStoreRegistered = !0, document.addEventListener("alpine:init", () => {
+    Alpine.store("rows", {
     items: [],
     init() {
     },
@@ -45,8 +46,9 @@ document.addEventListener("alpine:init", () => {
       const [c] = s.columns.splice(l, 1), a = Math.max(0, Math.min(r, i.columns.length));
       return i.columns.splice(a, 0, c), s.columns.forEach((d, u) => d.order = u), i.columns.forEach((d, u) => d.order = u), this.items = n, this.items;
     }
+    });
   });
-});
+}
 function f(o) {
   return {
     // Row drag handlers (existing - keep as is)
@@ -163,7 +165,7 @@ function f(o) {
     }
   };
 }
-window.addEventListener("alpine:init", () => {
+window.__filamentorBuilderDataRegistered || (window.__filamentorBuilderDataRegistered = !0, window.addEventListener("alpine:init", () => {
   Alpine.data("filamentor", () => ({
     showSettings: !1,
     activeRow: null,
@@ -187,26 +189,13 @@ window.addEventListener("alpine:init", () => {
      */
     init() {
       try {
-        if (!this.$refs.canvasData) {
-          console.warn("Canvas data reference not found");
-          return;
-        }
-        const o = this.$refs.canvasData.value;
-        if (o)
-          try {
-            const e = JSON.parse(o);
-            if (!Array.isArray(e)) {
-              console.error("Parsed layout is not an array");
-              return;
-            }
-            const t = e.sort((r, n) => {
-              const s = r.order !== void 0 ? r.order : 0, i = n.order !== void 0 ? n.order : 0;
-              return s - i;
-            });
-            Alpine.store("rows").setRows(t);
-          } catch (e) {
-            console.error("Failed to parse layout JSON:", e), Alpine.store("rows").setRows([]);
-          }
+        const o = this.$wire?.get?.("data.layout") ?? this.$refs.canvasData?.value ?? "[]", e = this.normalizeLayoutJson(o);
+        this.$refs.canvasData && (this.$refs.canvasData.value = e);
+        const t = JSON.parse(e), r = Array.isArray(t) ? t : [], n = r.sort((s, i) => {
+          const l = s.order !== void 0 ? s.order : 0, c = i.order !== void 0 ? i.order : 0;
+          return l - c;
+        });
+        Alpine.store("rows").setRows(n);
       } catch (o) {
         console.error("Error initializing builder:", o), Alpine.store("rows").setRows([]);
       }
@@ -1196,6 +1185,20 @@ window.addEventListener("alpine:init", () => {
         console.error("Unexpected error in updateCanvasData:", o);
       }
     },
+    normalizeLayoutJson(o) {
+      if (Array.isArray(o))
+        return JSON.stringify(o);
+      if (typeof o != "string")
+        return "[]";
+      const e = o.trim();
+      if (!e || e === "null")
+        return "[]";
+      try {
+        return JSON.parse(e), e;
+      } catch {
+        return "[]";
+      }
+    },
     // Helper function to safely parse numbers
     safeParseNumber(o) {
       try {
@@ -1206,4 +1209,4 @@ window.addEventListener("alpine:init", () => {
       }
     }
   }));
-});
+}));

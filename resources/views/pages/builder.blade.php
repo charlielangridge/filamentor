@@ -13,6 +13,8 @@
             @js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('filamentor', 'filamentor')),
             @js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('alpine-sort', 'filamentor'))
         ]">
+            <link id="filamentor-builder-css" rel="stylesheet"
+                href="{{ \Filament\Support\Facades\FilamentAsset::getStyleHref('filamentor', 'filamentor') }}">
 
             <div class="flex justify-start">
                 <button type="button"
@@ -23,10 +25,10 @@
                 </button>
             </div>
 
-            <input type="hidden" name="layout" x-ref="canvasData" wire:model="data.layout"
-                value="{{ $this->record->layout }}">
+            <input type="hidden" name="layout" x-ref="canvasData" wire:model.live="data.layout"
+                value="{{ $this->getLayoutStateJson() }}">
 
-            <div id="rows-container" x-data="filamentor" class="space-y-4 bg-white dark:bg-gray-900 p-4 rounded-lg">
+            <div id="rows-container" class="space-y-4 bg-white dark:bg-gray-900 p-4 rounded-lg">
                 <!-- Empty state when no rows exist -->
                 <div x-show="$store.rows.items.length === 0" class="flex flex-col items-center justify-center p-12 text-center rounded-lg">
                     <x-heroicon-o-rectangle-stack class="w-8 h-8 text-gray-400 mb-2" />

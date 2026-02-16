@@ -1,3 +1,6 @@
+if (!window.__filamentorRowsStoreRegistered) {
+    window.__filamentorRowsStoreRegistered = true;
+
 document.addEventListener('alpine:init', () => {
     Alpine.store('rows', {
         items: [],
@@ -89,3 +92,4 @@ document.addEventListener('alpine:init', () => {
         }
     });
 });
+}
